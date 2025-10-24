@@ -2,7 +2,7 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "bash start.sh"
+startCommand = "cd combined-server && node combined-server.js"
 
 [environments]
   [environments.production]
