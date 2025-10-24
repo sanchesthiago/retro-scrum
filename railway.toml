@@ -3,6 +3,11 @@ builder = "dockerfile"
 
 [deploy]
 startCommand = "node combined-server.js"
+healthCheckPath = "/health"
+healthCheckTimeout = 30
+
+[service]
+port = 3000
 
 [environments]
   [environments.production]

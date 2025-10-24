@@ -6,9 +6,16 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Configuração Railway
+// ✅ DEBUG: Ver todas as variáveis de ambiente
+console.log('🔍 ENVIRONMENT VARIABLES:');
+console.log('PORT:', process.env.PORT);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('RAILWAY_ENVIRONMENT:', process.env.RAILWAY_ENVIRONMENT);
+console.log('RAILWAY_SERVICE_NAME:', process.env.RAILWAY_SERVICE_NAME);
+console.log('RAILWAY_STATIC_URL:', process.env.RAILWAY_STATIC_URL);
+
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 const isProduction = process.env.NODE_ENV === 'production';
-const PORT = process.env.PORT || 3000;
 
 console.log(`🚀 Iniciando servidor...`);
 console.log(`📍 Ambiente: ${isProduction ? 'Produção' : 'Desenvolvimento'}`);
@@ -224,19 +231,16 @@ function generateId() {
   return Math.random().toString(36).substr(2, 9);
 }
 
-// ✅ Iniciar servidor
+// ✅ Iniciar servidor (VERSÃO CORRIGIDA)
 server.listen(PORT, '0.0.0.0', () => {
   console.log('='.repeat(50));
   console.log('🚀 EASYRETRO CLONE - SERVIDOR INICIADO!');
   console.log(`📍 Ambiente: ${isProduction ? 'Produção' : 'Desenvolvimento'}`);
   console.log(`🎯 Porta: ${PORT}`);
-  console.log(`🌐 URL: https://${process.env.RAILWAY_STATIC_URL || 'seu-app.railway.app'}`);
-  console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
-  console.log(`💾 Sessões ativas: ${sessions.size}`);
-  console.log('='.repeat(50));
 
   if (isProduction) {
-    console.log(`🌐 URL: https://seu-app.railway.app`);
+    console.log(`🌐 URL: https://${process.env.RAILWAY_STATIC_URL || 'seu-app.railway.app'}`);
+    console.log(`🔌 WebSocket: wss://${process.env.RAILWAY_STATIC_URL || 'seu-app.railway.app'}`);
   } else {
     console.log(`🔌 WebSocket: ws://localhost:${PORT}`);
     console.log(`📁 Angular Dev: http://localhost:4200`);
