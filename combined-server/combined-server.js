@@ -23,63 +23,77 @@ if (isProduction) {
   // ✅ PRODUÇÃO: Servir arquivos do Angular
   const fs = require('fs');
 
-  // ✅ Lista de caminhos possíveis (relativos ao __dirname)
-  const possiblePaths = [
-    path.join(__dirname, '../dist/retro-scrum/browser'),
-    path.join(__dirname, '../dist/retro-scrum'),
-    path.join(__dirname, '../dist'),
-    path.join(__dirname, './dist/retro-scrum/browser'),
-    path.join(__dirname, './dist/retro-scrum'),
-    path.join(__dirname, './dist')
-  ];
+  function findAngularBuild() {
+    const possiblePaths = [
+      path.join(__dirname, '../dist/retro-scrum'), // SEU CASO
+      path.join(__dirname, '../dist/retro-scrum/browser'),
+      path.join(__dirname, '../../dist/retro-scrum'),
+      path.join(__dirname, './dist/retro-scrum'),
+      '/app/dist/retro-scrum', // Caminho absoluto
+      '/app/dist/retro-scrum/browser'
+    ];
 
-  let angularPath = null;
+    for (const buildPath of possiblePaths) {
+      const indexPath = path.join(buildPath, 'index.html');
+      console.log(`🔍 Verificando: ${buildPath}`);
 
-  // ✅ Procurar o caminho correto
-  for (const possiblePath of possiblePaths) {
-    try {
-      const indexPath = path.join(possiblePath, 'index.html');
-      fs.accessSync(indexPath);
-      angularPath = possiblePath;
-      console.log(`✅ Angular files found at: ${angularPath}`);
-
-      const files = fs.readdirSync(angularPath);
-      console.log(`📄 Arquivos encontrados: ${files.length} arquivos`);
-      console.log(`📄 Primeiros arquivos: ${files.slice(0, 5).join(', ')}...`);
-      break;
-    } catch (error) {
-      console.log(`❌ Não encontrado: ${possiblePath}`);
+      if (fs.existsSync(indexPath)) {
+        console.log(`✅ ENCONTRADO em: ${buildPath}`);
+        return buildPath;
+      }
     }
+
+    return null;
   }
 
-  if (!angularPath) {
-    console.error('❌ Nenhum build do Angular encontrado!');
-    // Debug adicional
-    console.log('🔍 Estrutura de diretórios:');
-    try {
-      console.log('Diretório atual:', __dirname);
-      const items = fs.readdirSync(__dirname);
-      console.log('Conteúdo do diretório atual:', items);
+  const angularPath = findAngularBuild();
 
-      if (fs.existsSync(path.join(__dirname, '..', 'dist'))) {
-        const distItems = fs.readdirSync(path.join(__dirname, '..', 'dist'));
-        console.log('Conteúdo de ../dist:', distItems);
-      }
-    } catch (e) {
-      console.log('Erro ao ler diretórios:', e.message);
-    }
-  } else {
-    // ✅ Servir arquivos estáticos
+  if (angularPath) {
+    // ✅ Configurar servidor estático
     app.use(express.static(angularPath));
 
-    // ✅ Rota para SPA - usar caminho absoluto
+    // ✅ Rota SPA
     app.get('*', (req, res) => {
-      const indexPath = path.join(angularPath, 'index.html');
-      console.log(`📁 Servindo index.html de: ${indexPath}`);
-      res.sendFile(indexPath); // Agora é um caminho absoluto
+      res.sendFile(path.join(angularPath, 'index.html'));
     });
 
-    console.log('📁 Servindo arquivos do Angular (Produção)');
+    console.log('🎉 Angular SPA configurado com sucesso!');
+
+  } else {
+    console.error('💥 Build do Angular não encontrado em nenhum local!');
+
+    // Rota de fallback mais informativa
+    app.get('*', (req, res) => {
+      if (req.path === '/health') {
+        return res.json({ status: 'ERROR', message: 'Angular build not found' });
+      }
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Erro de Configuração</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .error { color: #d32f2f; background: #ffebee; padding: 20px; border-radius: 5px; }
+            .info { background: #e3f2fd; padding: 15px; border-radius: 5px; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <h1>🚨 Erro de Configuração</h1>
+          <div class="error">
+            <h3>Build do Angular não encontrado</h3>
+            <p>O servidor não conseguiu localizar os arquivos do Angular.</p>
+          </div>
+          <div class="info">
+            <h4>Informações para debug:</h4>
+            <p><strong>Diretório atual:</strong> ${__dirname}</p>
+            <p><strong>Porta:</strong> ${PORT}</p>
+            <p><strong>Ambiente:</strong> ${process.env.NODE_ENV}</p>
+          </div>
+        </body>
+        </html>
+      `);
+    });
   }
 }
 app.get('/test', (req, res) => {
