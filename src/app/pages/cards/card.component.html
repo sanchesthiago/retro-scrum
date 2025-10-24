@@ -1,0 +1,31 @@
+<div class="card" [class.revealed]="isRevealed()" [class.blurred]="!isRevealed()">
+  <div class="card-content">
+    <p>{{ card().content }}</p>
+
+    @if (isRevealed()) {
+      <div class="card-footer">
+        <div class="card-meta">
+          <span class="votes" [class.has-votes]="card().votes > 0">
+            👍 {{ card().votes }}
+          </span>
+        </div>
+        <div class="card-actions">
+          <button (click)="vote()" class="vote-btn" [disabled]="!canInteract() || isVoting()">
+            @if (isVoting()) {
+              ⏳
+            } @else {
+              👍
+            }
+          </button>
+          <button (click)="delete()" class="delete-btn" [disabled]="!canInteract() || isDeleting()">
+            @if (isDeleting()) {
+              ⏳
+            } @else {
+              🗑️
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

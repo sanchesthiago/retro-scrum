@@ -1,0 +1,92 @@
+.column {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.column-title {
+  margin: 0 0 16px 0;
+  text-align: center;
+  color: #333;
+  font-weight: 600;
+}
+
+.add-card-form {
+  margin-bottom: 16px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.add-btn {
+  width: 100%;
+  padding: 8px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-btn:hover {
+  background: #45a049;
+}
+
+.cards-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.column-footer {
+  margin-top: 8px;
+  text-align: center;
+  color: #666;
+  font-size: 0.8em;
+}
+
+.column-info {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 0.9em;
+  color: #666;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.blurred-info {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.empty-column {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-style: italic;
+}
+.disconnected-info {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.empty-hint {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 5px;
+}

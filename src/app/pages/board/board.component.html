@@ -1,0 +1,106 @@
+@if (session()) {
+  <div class="board-container">
+    <header class="board-header">
+      <div class="session-stats">
+        <div class="stat">
+          <strong>👥 Participantes:</strong> {{ getTotalParticipants() }}
+        </div>
+        <div class="stat">
+          <strong>✅ Finalizados:</strong> {{ getFinishedCount() }}/{{ getTotalParticipants() }}
+        </div>
+
+        @if (session()!.isRevealed) {
+          <div class="stat revealed">
+            <strong>🎉 Cards Revelados!</strong>
+          </div>
+        } @else {
+          <div class="stat hidden">
+            <strong>🔒 Cards Ocultos</strong>
+          </div>
+        }
+
+        <!-- Status da conexão -->
+        <div class="stat connection" [class]="connectionStatus()">
+          @switch (connectionStatus()) {
+            @case ('connected') { ✅ Conectado }
+            @case ('connecting') { ⏳ Conectando... }
+            @case ('disconnected') { ❌ Offline }
+          }
+        </div>
+      </div>
+
+      <div class="board-controls">
+        @if (!hasCurrentUserFinished() && !session()!.isRevealed) {
+          <button (click)="markAsFinished()" class="finish-btn" [disabled]="isFinishing() || connectionStatus() !== 'connected'">
+            @if (isFinishing()) {
+              ⏳
+            } @else {
+              ✅ Finalizar
+            }
+          </button>
+        }
+
+        @if (allUsersFinished() && !session()!.isRevealed) {
+          <button (click)="revealCards()" class="reveal-btn" [disabled]="isRevealing() || connectionStatus() !== 'connected'">
+            @if (isRevealing()) {
+              ⏳
+            } @else {
+              👀 Revelar Cards
+            }
+          </button>
+        }
+
+        @if (hasCurrentUserFinished() && !session()!.isRevealed) {
+          <div class="waiting-message">
+            ⏳ Aguardando outros participantes...
+            ({{ getFinishedCount() }}/{{ getTotalParticipants() }})
+          </div>
+        }
+
+        @if (session()!.isRevealed) {
+          <div class="completed-message">
+            ✅ Discussão Liberada!
+          </div>
+        }
+      </div>
+    </header>
+
+    <!-- Lista de participantes -->
+    <div class="participants-list">
+      <strong>Participantes:</strong>
+      @for (participant of session()!.participants; track participant.name) {
+        <span class="participant-tag" [class.finished]="participant.hasFinished">
+          {{ participant.name }}{{ participant.hasFinished ? ' ✅' : ' ⏳' }}
+        </span>
+      }
+    </div>
+
+    <!-- Mensagem informativa -->
+    @if (!session()!.isRevealed) {
+      <div class="info-message">
+        <p>📝 <strong>Escreva seus cards</strong> - Eles aparecerão borrados para todos em tempo real</p>
+        <p>✅ <strong>Clique em "Finalizar"</strong> quando terminar de escrever</p>
+        <p>👀 <strong>Quando todos finalizarem</strong> - Os cards serão revelados para discussão</p>
+      </div>
+    } @else {
+      <div class="info-message revealed">
+        <p>🎉 <strong>Discussão liberada!</strong> - Todos os cards estão visíveis</p>
+        <p>👍 <strong>Vote nos melhores cards</strong> clicando no botão de like</p>
+      </div>
+    }
+
+    <!-- Colunas -->
+    <div class="board-columns">
+      @for (column of columns; track column.type) {
+        <app-column
+          [title]="column.title"
+          [type]="column.type"
+          [cards]="session()!.cards"
+          [isRevealed]="session()!.isRevealed"
+          [canAddCards]="canAddCards()"
+          [isConnected]="connectionStatus() === 'connected'"
+        ></app-column>
+      }
+    </div>
+  </div>
+}
