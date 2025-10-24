@@ -23,16 +23,14 @@ export class WebsocketService {
 
   private getWebSocketUrl(): string {
     if (this.isProduction()) {
-      // ✅ Produção: usar wss:// com o domínio do Railway
-      return 'wss://retro-scrum.up.railway.app';
+      // ✅ NOVA URL DO RAILWAY
+      return 'wss://retro-scrum-production.up.railway.app';
     }
-
-    // ✅ Desenvolvimento
     return 'ws://localhost:3001';
   }
 
   private isProduction(): boolean {
-    return !window.location.hostname.includes('localhost');
+    return window.location.hostname !== 'localhost';
   }
 
   private connect(): void {

@@ -239,8 +239,9 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`🎯 Porta: ${PORT} (Railway internal port)`);
 
   if (isProduction) {
-    console.log(`🌐 URL pública: https://retro-scrum.up.railway.app`);
-    console.log(`🔌 WebSocket: wss://retro-scrum.up.railway.app`);
+    // ✅ NOVA URL CORRETA
+    console.log(`🌐 URL pública: https://retro-scrum-production.up.railway.app`);
+    console.log(`🔌 WebSocket: wss://retro-scrum-production.up.railway.app`);
   }
 
   console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
