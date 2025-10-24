@@ -21,7 +21,7 @@ console.log(`🎯 Porta: ${PORT} (definida pelo Railway)`);
 
 if (isProduction) {
   // ✅ PRODUÇÃO: Servir arquivos do Angular
-  const angularPath = path.join(__dirname, '../dist/retro-scrum/browser');
+  const angularPath = path.join('../dist/retro-scrum/browser');
   const fs = require('fs');
   console.log(`📁 Tentando acessar: ${angularPath}`);
 
