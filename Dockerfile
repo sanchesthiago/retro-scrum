@@ -2,25 +2,19 @@ FROM node:22.20.0-alpine
 
 WORKDIR /app
 
-# Copiar tudo
+# Copiar projeto
 COPY . .
 
-# Instalar dependências e buildar Angular
-RUN npm ci
-RUN npm run build
+# Build rápido
+RUN npm ci && npm run build
 
-# Instalar dependências do servidor
+# Servidor
 WORKDIR /app/combined-server
 RUN npm ci --only=production
 
-# Voltar para raiz
-WORKDIR /app
-
-# Tornar start.sh executável
-RUN chmod +x start.sh
-
+# Porta e health check
 EXPOSE 3000
-ENV NODE_ENV=production
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 CMD node -e "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
-# Usar SEU script start (que chama start.sh)
-CMD ["npm", "start"]
+# Start direto
+CMD ["node", "combined-server.js"]
