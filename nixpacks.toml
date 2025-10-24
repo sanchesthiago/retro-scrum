@@ -1,6 +1,6 @@
 [phases.setup]
 cmds = [
-  "curl -fsSL https://deb.nodesource.com/setup_22.x | bash -",
+  "curl -fsSL https://deb.nodesource.com/setup_22.20.x | bash -",
   "apt-get install -y nodejs",
   "npm install -g @angular/cli"
 ]
