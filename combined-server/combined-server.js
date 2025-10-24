@@ -22,8 +22,40 @@ console.log(`🎯 Porta: ${PORT} (definida pelo Railway)`);
 if (isProduction) {
   // ✅ PRODUÇÃO: Servir arquivos do Angular
   const angularPath = path.join(__dirname, '../dist/retro-scrum');
-  app.use(express.static(angularPath));
+  const fs = require('fs');
+  console.log(`📁 Tentando acessar: ${angularPath}`);
 
+  try {
+    const files = fs.readdirSync(angularPath);
+    console.log(`✅ Arquivos encontrados: ${files.length} arquivos`);
+    console.log(`📄 Arquivos: ${files.slice(0, 10).join(', ')}...`);
+  } catch (error) {
+    console.log(`❌ Pasta não encontrada: ${error.message}`);
+
+    // ✅ Tentar caminhos alternativos
+    const possiblePaths = [
+      '../dist/retro-scrum',
+      '../dist',
+      './dist/retro-scrum',
+      './dist',
+      '../dist/retro-scrum/browser',
+      '../dist/browser'
+    ];
+
+    for (const possiblePath of possiblePaths) {
+      const testPath = path.join(__dirname, possiblePath);
+      try {
+        const testFiles = fs.readdirSync(testPath);
+        console.log(`🎯 CAMINHO CORRETO ENCONTRADO: ${testPath}`);
+        console.log(`📄 Arquivos: ${testFiles.slice(0, 5).join(', ')}...`);
+        break;
+      } catch (e) {
+        // Continua procurando
+      }
+    }
+  }
+
+  app.use(express.static(angularPath));
   app.get('*', (req, res) => {
     res.sendFile(path.join(angularPath, 'index.html'));
   });

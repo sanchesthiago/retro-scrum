@@ -4,17 +4,17 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm ci && npm run build
+# ✅ Build do Angular com output explícito
+RUN npm ci
+RUN npx ng build --configuration production --output-path=dist/retro-scrum
+
+# ✅ Verificar se o build foi criado
+RUN echo "📁 Estrutura após build:" && ls -la dist/ && ls -la dist/retro-scrum/
 
 WORKDIR /app/combined-server
-RUN npm ci --only=production
+RUN npm ci --production
 
 EXPOSE 8080
-
-# ✅ APENAS NODE_ENV (Railway controla a PORT)
 ENV NODE_ENV=production
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 CMD ["node", "combined-server.js"]
