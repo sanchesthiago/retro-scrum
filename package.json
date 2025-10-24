@@ -1,6 +1,7 @@
 {
   "name": "retro-scrum",
   "version": "0.0.0",
+  "type": "commonjs",
   "scripts": {
     "ng": "ng",
     "start": "bash start.sh",
