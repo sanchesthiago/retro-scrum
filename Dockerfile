@@ -6,10 +6,10 @@ COPY . .
 
 # ✅ Build do Angular com output explícito
 RUN npm ci
-RUN npx ng build --configuration production --output-path=dist/retro-scrum
+RUN npx ng build --configuration production --output-path=dist/retro-scrum/browser
 
 # ✅ Verificar se o build foi criado
-RUN echo "📁 Estrutura após build:" && ls -la dist/ && ls -la dist/retro-scrum/
+RUN echo "📁 Estrutura após build:" && ls -la dist/ && ls -la dist/retro-scrum/browser
 
 WORKDIR /app/combined-server
 RUN npm ci --production
