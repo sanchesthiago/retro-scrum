@@ -1,18 +1,27 @@
+[build]
+baseImage = "ubuntu:22.04"
+
 [phases.setup]
 cmds = [
-  "curl -fsSL https://deb.nodesource.com/setup_22.20.x | bash -",
-  "apt-get install -y nodejs",
-  "npm install -g @angular/cli"
+  "apt-get update",
+  "apt-get install -y curl",
+  # ✅ Instalar Node.js 22.20.x específico
+  "curl -fsSL https://nodejs.org/dist/v22.20.0/node-v22.20.0-linux-x64.tar.xz | tar -xJ -C /usr/local --strip-components=1",
+  # ✅ Angular CLI 20 (sua versão atual)
+  "npm install -g @angular/cli@20"
 ]
 
 [phases.install]
 cmds = [
-  "npm install",
-  "cd combined-server && npm install"
+  "npm ci",
+  "cd backend && npm ci"
 ]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = ["ng build --configuration production"]
 
 [start]
-cmd = "bash start.sh"
+cmd = "cd backend && node server.js"
+
+[variables]
+NODE_ENV = "production"
