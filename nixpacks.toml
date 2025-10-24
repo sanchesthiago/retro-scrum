@@ -14,14 +14,14 @@ cmds = [
 [phases.install]
 cmds = [
   "npm ci",
-  "cd backend && npm ci"
+  "cd combined-server && npm ci"
 ]
 
 [phases.build]
 cmds = ["ng build --configuration production"]
 
 [start]
-cmd = "cd backend && node server.js"
+cmd = "cd combined-server && node combined-server.js"
 
 [variables]
 NODE_ENV = "production"
