@@ -23,10 +23,11 @@ export class WebsocketService {
 
   private getWebSocketUrl(): string {
     if (this.isProduction()) {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      return `${protocol}//${window.location.host}`;
+      // ✅ Produção: usar wss:// com o domínio do Railway
+      return 'wss://retro-scrum.up.railway.app';
     }
 
+    // ✅ Desenvolvimento
     return 'ws://localhost:3001';
   }
 

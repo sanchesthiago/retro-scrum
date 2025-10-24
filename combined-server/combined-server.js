@@ -6,15 +6,16 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-// ✅ DEBUG: Ver todas as variáveis de ambiente
+// ✅ ACEITAR A PORTA QUE O RAILWAY DEFINE
+const PORT = process.env.PORT || 3000; // Railway sempre usa 8080
+
 console.log('🔍 ENVIRONMENT VARIABLES:');
 console.log('PORT:', process.env.PORT);
 console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('RAILWAY_ENVIRONMENT:', process.env.RAILWAY_ENVIRONMENT);
-console.log('RAILWAY_SERVICE_NAME:', process.env.RAILWAY_SERVICE_NAME);
-console.log('RAILWAY_STATIC_URL:', process.env.RAILWAY_STATIC_URL);
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+console.log(`🚀 Iniciando servidor...`);
+console.log(`📍 Ambiente: ${isProduction ? 'Produção' : 'Desenvolvimento'}`);
+console.log(`🎯 Porta: ${PORT} (definida pelo Railway)`);
 const isProduction = process.env.NODE_ENV === 'production';
 
 console.log(`🚀 Iniciando servidor...`);
@@ -236,15 +237,11 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log('='.repeat(50));
   console.log('🚀 EASYRETRO CLONE - SERVIDOR INICIADO!');
   console.log(`📍 Ambiente: ${isProduction ? 'Produção' : 'Desenvolvimento'}`);
-  console.log(`🎯 Porta: ${PORT}`);
+  console.log(`🎯 Porta: ${PORT} (Railway internal port)`);
 
   if (isProduction) {
-    console.log(`🌐 URL: https://${process.env.RAILWAY_STATIC_URL || 'seu-app.railway.app'}`);
-    console.log(`🔌 WebSocket: wss://${process.env.RAILWAY_STATIC_URL || 'seu-app.railway.app'}`);
-  } else {
-    console.log(`🔌 WebSocket: ws://localhost:${PORT}`);
-    console.log(`📁 Angular Dev: http://localhost:4200`);
-    console.log(`📁 Angular Build: http://localhost:${PORT}`);
+    console.log(`🌐 URL pública: https://retro-scrum.up.railway.app`);
+    console.log(`🔌 WebSocket: wss://retro-scrum.up.railway.app`);
   }
 
   console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
