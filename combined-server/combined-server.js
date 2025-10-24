@@ -6,9 +6,11 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-// ✅ ACEITAR A PORTA QUE O RAILWAY DEFINE
-const PORT = process.env.PORT || 3000; // Railway sempre usa 8080
+// ✅ DEFINIR isProduction ANTES de usar
+const isProduction = process.env.NODE_ENV === 'production';
+const PORT = process.env.PORT || 3000;
 
+// ✅ AGORA pode usar isProduction
 console.log('🔍 ENVIRONMENT VARIABLES:');
 console.log('PORT:', process.env.PORT);
 console.log('NODE_ENV:', process.env.NODE_ENV);
@@ -16,11 +18,6 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log(`🚀 Iniciando servidor...`);
 console.log(`📍 Ambiente: ${isProduction ? 'Produção' : 'Desenvolvimento'}`);
 console.log(`🎯 Porta: ${PORT} (definida pelo Railway)`);
-const isProduction = process.env.NODE_ENV === 'production';
-
-console.log(`🚀 Iniciando servidor...`);
-console.log(`📍 Ambiente: ${isProduction ? 'Produção' : 'Desenvolvimento'}`);
-console.log(`🎯 Porta: ${PORT}`);
 
 if (isProduction) {
   // ✅ PRODUÇÃO: Servir arquivos do Angular
@@ -34,7 +31,7 @@ if (isProduction) {
   console.log('📁 Servindo arquivos do Angular (Produção)');
 }
 
-// ✅ Rota para health check (importante para Railway)
+// ✅ Rota para health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -47,7 +44,6 @@ app.get('/health', (req, res) => {
 // ✅ WebSocket Server
 const wss = new WebSocket.Server({
   server,
-  // ✅ Configuração para produção
   perMessageDeflate: false
 });
 
@@ -55,7 +51,6 @@ const wss = new WebSocket.Server({
 const sessions = new Map();
 
 wss.on('connection', (ws, request) => {
-  // ✅ Em desenvolvimento, verificar origem se necessário
   if (!isProduction) {
     const origin = request.headers.origin;
     if (origin && origin !== 'http://localhost:4200' && origin !== 'http://localhost:3000') {
@@ -98,7 +93,6 @@ wss.on('connection', (ws, request) => {
       else if (message.type === 'join-session') {
         const session = sessions.get(message.sessionId);
         if (session) {
-          // Verificar se usuário já existe
           const existingUser = session.participants.find(p => p.name === message.userName);
           if (!existingUser) {
             session.participants.push({
@@ -145,8 +139,6 @@ wss.on('connection', (ws, request) => {
             participant.hasFinished = true;
             broadcastToSession(message.sessionId, { type: 'session-updated', session });
             console.log(`✅ "${message.userName}" finalizou`);
-
-            // Verificar se todos finalizaram
             checkIfAllFinished(session);
           }
         }
@@ -232,7 +224,7 @@ function generateId() {
   return Math.random().toString(36).substr(2, 9);
 }
 
-// ✅ Iniciar servidor (VERSÃO CORRIGIDA)
+// ✅ Iniciar servidor
 server.listen(PORT, '0.0.0.0', () => {
   console.log('='.repeat(50));
   console.log('🚀 EASYRETRO CLONE - SERVIDOR INICIADO!');
