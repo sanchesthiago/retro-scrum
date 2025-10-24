@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "bash start.sh",
-    "build": "ng build",
+    "build": "ng build --configuration=production",
     "dev:frontend": "ng serve",
     "dev:backend": "cd backend && npm run dev",
     "install:all": "npm install && cd combined-server && npm install"
