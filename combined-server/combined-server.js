@@ -21,46 +21,66 @@ console.log(`🎯 Porta: ${PORT} (definida pelo Railway)`);
 
 if (isProduction) {
   // ✅ PRODUÇÃO: Servir arquivos do Angular
-  const angularPath = path.join('../dist/retro-scrum/browser');
   const fs = require('fs');
-  console.log(`📁 Tentando acessar: ${angularPath}`);
 
-  try {
-    const files = fs.readdirSync(angularPath);
-    console.log(`✅ Arquivos encontrados: ${files.length} arquivos`);
-    console.log(`📄 Arquivos: ${files.slice(0, 10).join(', ')}...`);
-  } catch (error) {
-    console.log(`❌ Pasta não encontrada: ${error.message}`);
+  // ✅ Lista de caminhos possíveis (relativos ao __dirname)
+  const possiblePaths = [
+    path.join(__dirname, '../dist/retro-scrum/browser'),
+    path.join(__dirname, '../dist/retro-scrum'),
+    path.join(__dirname, '../dist'),
+    path.join(__dirname, './dist/retro-scrum/browser'),
+    path.join(__dirname, './dist/retro-scrum'),
+    path.join(__dirname, './dist')
+  ];
 
-    // ✅ Tentar caminhos alternativos
-    const possiblePaths = [
-      '../dist/retro-scrum',
-      '../dist',
-      './dist/retro-scrum',
-      './dist',
-      '../dist/retro-scrum/browser',
-      '../dist/browser'
-    ];
+  let angularPath = null;
 
-    for (const possiblePath of possiblePaths) {
-      const testPath = path.join(__dirname, possiblePath);
-      try {
-        const testFiles = fs.readdirSync(testPath);
-        console.log(`🎯 CAMINHO CORRETO ENCONTRADO: ${testPath}`);
-        console.log(`📄 Arquivos: ${testFiles.slice(0, 5).join(', ')}...`);
-        break;
-      } catch (e) {
-        // Continua procurando
-      }
+  // ✅ Procurar o caminho correto
+  for (const possiblePath of possiblePaths) {
+    try {
+      const indexPath = path.join(possiblePath, 'index.html');
+      fs.accessSync(indexPath);
+      angularPath = possiblePath;
+      console.log(`✅ Angular files found at: ${angularPath}`);
+
+      const files = fs.readdirSync(angularPath);
+      console.log(`📄 Arquivos encontrados: ${files.length} arquivos`);
+      console.log(`📄 Primeiros arquivos: ${files.slice(0, 5).join(', ')}...`);
+      break;
+    } catch (error) {
+      console.log(`❌ Não encontrado: ${possiblePath}`);
     }
   }
 
-  app.use(express.static(angularPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(angularPath, 'index.html'));
-  });
+  if (!angularPath) {
+    console.error('❌ Nenhum build do Angular encontrado!');
+    // Debug adicional
+    console.log('🔍 Estrutura de diretórios:');
+    try {
+      console.log('Diretório atual:', __dirname);
+      const items = fs.readdirSync(__dirname);
+      console.log('Conteúdo do diretório atual:', items);
 
-  console.log('📁 Servindo arquivos do Angular (Produção)');
+      if (fs.existsSync(path.join(__dirname, '..', 'dist'))) {
+        const distItems = fs.readdirSync(path.join(__dirname, '..', 'dist'));
+        console.log('Conteúdo de ../dist:', distItems);
+      }
+    } catch (e) {
+      console.log('Erro ao ler diretórios:', e.message);
+    }
+  } else {
+    // ✅ Servir arquivos estáticos
+    app.use(express.static(angularPath));
+
+    // ✅ Rota para SPA - usar caminho absoluto
+    app.get('*', (req, res) => {
+      const indexPath = path.join(angularPath, 'index.html');
+      console.log(`📁 Servindo index.html de: ${indexPath}`);
+      res.sendFile(indexPath); // Agora é um caminho absoluto
+    });
+
+    console.log('📁 Servindo arquivos do Angular (Produção)');
+  }
 }
 app.get('/test', (req, res) => {
   res.json({
