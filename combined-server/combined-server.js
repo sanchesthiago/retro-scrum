@@ -30,6 +30,13 @@ if (isProduction) {
 
   console.log('📁 Servindo arquivos do Angular (Produção)');
 }
+app.get('/test', (req, res) => {
+  res.json({
+    message: 'Servidor funcionando!',
+    timestamp: new Date().toISOString(),
+    environment: isProduction ? 'production' : 'development'
+  });
+});
 
 // ✅ Rota para health check
 app.get('/health', (req, res) => {
