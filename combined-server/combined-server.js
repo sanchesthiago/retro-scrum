@@ -22,25 +22,59 @@ console.log(`🎯 Porta: ${PORT} (definida pelo Railway)`);
 if (isProduction) {
   // ✅ PRODUÇÃO: Servir arquivos do Angular
   const fs = require('fs');
+  const path = require('path');
 
-  function findAngularBuild() {
-    const possiblePaths = [
-      path.join(__dirname, '../dist/retro-scrum'), // SEU CASO
-      path.join(__dirname, '../dist/retro-scrum/browser'),
-      path.join(__dirname, '../../dist/retro-scrum'),
-      path.join(__dirname, './dist/retro-scrum'),
-      '/app/dist/retro-scrum', // Caminho absoluto
-      '/app/dist/retro-scrum/browser'
-    ];
+  console.log('🔍 INICIANDO BUSCA POR BUILD ANGULAR...');
 
-    for (const buildPath of possiblePaths) {
-      const indexPath = path.join(buildPath, 'index.html');
-      console.log(`🔍 Verificando: ${buildPath}`);
+  // ✅ Buscar recursivamente pelo index.html
+  function findAngularBuild(startPath = '/app') {
+    console.log(`🔍 Procurando em: ${startPath}`);
 
-      if (fs.existsSync(indexPath)) {
-        console.log(`✅ ENCONTRADO em: ${buildPath}`);
-        return buildPath;
+    try {
+      // Primeiro, verifica se existe dist/retro-scrum no caminho comum
+      const commonPaths = [
+        path.join(startPath, 'dist', 'retro-scrum', 'browser'),
+        path.join(startPath, 'dist', 'retro-scrum'),
+        path.join(startPath, 'dist'),
+        path.join(__dirname, '..', 'dist', 'retro-scrum', 'browser'),
+        path.join(__dirname, '..', 'dist', 'retro-scrum'),
+        path.join(__dirname, '..', 'dist'),
+        path.join(__dirname, 'dist', 'retro-scrum', 'browser'),
+        path.join(__dirname, 'dist', 'retro-scrum'),
+        path.join(__dirname, 'dist')
+      ];
+
+      for (const buildPath of commonPaths) {
+        const indexPath = path.join(buildPath, 'index.html');
+        console.log(`   📁 Testando: ${buildPath}`);
+
+        if (fs.existsSync(indexPath)) {
+          console.log(`   ✅ ENCONTRADO: ${indexPath}`);
+          return buildPath;
+        }
       }
+
+      // Se não encontrou, lista a estrutura para debug
+      console.log('📂 ESTRUTURA DO /app:');
+      try {
+        const rootItems = fs.readdirSync('/app');
+        console.log('   /app:', rootItems);
+
+        if (fs.existsSync('/app/dist')) {
+          const distItems = fs.readdirSync('/app/dist');
+          console.log('   /app/dist:', distItems);
+
+          if (fs.existsSync('/app/dist/retro-scrum')) {
+            const retroItems = fs.readdirSync('/app/dist/retro-scrum');
+            console.log('   /app/dist/retro-scrum:', retroItems);
+          }
+        }
+      } catch (e) {
+        console.log('   Erro ao ler estrutura:', e.message);
+      }
+
+    } catch (error) {
+      console.log('   Erro na busca:', error.message);
     }
 
     return null;
@@ -49,46 +83,80 @@ if (isProduction) {
   const angularPath = findAngularBuild();
 
   if (angularPath) {
-    // ✅ Configurar servidor estático
+    console.log(`🎯 CONFIGURANDO ANGULAR EM: ${angularPath}`);
+
+    // Listar arquivos para confirmação
+    try {
+      const files = fs.readdirSync(angularPath);
+      console.log(`📄 Arquivos no build (${files.length}):`, files.slice(0, 10));
+    } catch (e) {
+      console.log('❌ Erro ao listar arquivos:', e.message);
+    }
+
+    // ✅ Servir arquivos estáticos
     app.use(express.static(angularPath));
 
     // ✅ Rota SPA
     app.get('*', (req, res) => {
-      res.sendFile(path.join(angularPath, 'index.html'));
+      const indexPath = path.join(angularPath, 'index.html');
+      console.log(`📦 Servindo SPA: ${indexPath}`);
+      res.sendFile(indexPath);
     });
 
-    console.log('🎉 Angular SPA configurado com sucesso!');
+    console.log('🚀 ANGULAR CONFIGURADO COM SUCESSO!');
 
   } else {
-    console.error('💥 Build do Angular não encontrado em nenhum local!');
+    console.error('💥 BUILD DO ANGULAR NÃO ENCONTRADO!');
 
-    // Rota de fallback mais informativa
+    // Servir página de erro mais detalhada
     app.get('*', (req, res) => {
       if (req.path === '/health') {
-        return res.json({ status: 'ERROR', message: 'Angular build not found' });
+        return res.json({
+          status: 'ERROR',
+          message: 'Angular build not found',
+          timestamp: new Date().toISOString()
+        });
       }
+
       res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Erro de Configuração</title>
+          <title>Erro - Build Não Encontrado</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            .error { color: #d32f2f; background: #ffebee; padding: 20px; border-radius: 5px; }
-            .info { background: #e3f2fd; padding: 15px; border-radius: 5px; margin-top: 20px; }
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            .error { color: #d32f2f; background: #ffebee; padding: 20px; border-radius: 5px; border-left: 4px solid #d32f2f; }
+            .info { background: #e3f2fd; padding: 15px; border-radius: 5px; margin-top: 20px; border-left: 4px solid #2196f3; }
+            .solution { background: #e8f5e8; padding: 15px; border-radius: 5px; margin-top: 20px; border-left: 4px solid #4caf50; }
+            code { background: #f5f5f5; padding: 2px 5px; border-radius: 3px; }
           </style>
         </head>
         <body>
-          <h1>🚨 Erro de Configuração</h1>
+          <h1>🚨 Erro de Deploy</h1>
+
           <div class="error">
-            <h3>Build do Angular não encontrado</h3>
-            <p>O servidor não conseguiu localizar os arquivos do Angular.</p>
+            <h3>Build do Angular Não Encontrado</h3>
+            <p>O servidor não conseguiu localizar os arquivos compilados do Angular.</p>
           </div>
+
           <div class="info">
-            <h4>Informações para debug:</h4>
-            <p><strong>Diretório atual:</strong> ${__dirname}</p>
-            <p><strong>Porta:</strong> ${PORT}</p>
-            <p><strong>Ambiente:</strong> ${process.env.NODE_ENV}</p>
+            <h4>📋 Informações Técnicas:</h4>
+            <ul>
+              <li><strong>Diretório atual:</strong> <code>${__dirname}</code></li>
+              <li><strong>Porta:</strong> ${PORT}</li>
+              <li><strong>Ambiente:</strong> ${process.env.NODE_ENV}</li>
+              <li><strong>Timestamp:</strong> ${new Date().toISOString()}</li>
+            </ul>
+          </div>
+
+          <div class="solution">
+            <h4>🔧 Possíveis Soluções:</h4>
+            <ol>
+              <li>Verifique se o build do Angular foi executado com sucesso</li>
+              <li>Confirme a configuração do <code>outputPath</code> no <code>angular.json</code></li>
+              <li>Verifique os logs de build no Railway</li>
+              <li>O build pode estar em um caminho diferente do esperado</li>
+            </ol>
           </div>
         </body>
         </html>
