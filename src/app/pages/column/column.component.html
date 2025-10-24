@@ -1,0 +1,54 @@
+<div class="column">
+  <h3 class="column-title">{{ title() }}</h3>
+
+  @if (canAddCards() && isConnected()) {
+    <div class="add-card-form">
+      <textarea
+        [value]="newCardContent()"
+        (input)="onContentInput($event)"
+        (keypress)="onKeyPress($event)"
+        placeholder="Escreva seu comentário... (Enter para enviar)"
+        class="form-textarea"
+        [disabled]="isAdding()"
+        rows="3"
+      ></textarea>
+      <button (click)="addCard()" class="add-btn"
+              [disabled]="isAdding() || !newCardContent().trim() || !isConnected()">
+        @if (isAdding()) {
+          ⏳ Enviando...
+        } @else {
+          ➕ Adicionar
+        }
+      </button>
+    </div>
+  }
+
+  <!-- Info da coluna -->
+  <div class="column-info">
+    {{ getColumnCards().length }} card{{ getColumnCards().length !== 1 ? 's' : '' }}
+    @if (!isRevealed() && getColumnCards().length > 0) {
+      <span class="blurred-info">(ocultos)</span>
+    }
+    @if (!isConnected()) {
+      <span class="disconnected-info">(offline)</span>
+    }
+  </div>
+
+  <!-- Cards -->
+  <div class="cards-container">
+    @for (card of getColumnCards(); track card.id) {
+      <app-card
+        [card]="card"
+        [isRevealed]="isRevealed()"
+        [canInteract]="isRevealed() && isConnected()"
+      ></app-card>
+    } @empty {
+      <div class="empty-column">
+        <p>📭 Nenhum card ainda</p>
+        @if (canAddCards()) {
+          <p class="empty-hint">Seja o primeiro a adicionar um card!</p>
+        }
+      </div>
+    }
+  </div>
+</div>

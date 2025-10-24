@@ -1,0 +1,97 @@
+@if (!session()) {
+  <div class="session-container">
+    <div class="session-header">
+      <h1>EasyRetro Clone</h1>
+      <p>Crie ou entre em uma sessão de retrospectiva</p>
+    </div>
+
+    <div class="session-options">
+      <div class="option-card">
+        <h3>Criar Nova Sessão</h3>
+        <button (click)="isCreating.set(true)" class="option-btn">
+          Criar Sessão
+        </button>
+      </div>
+
+      <div class="option-card">
+        <h3>Entrar em Sessão Existente</h3>
+        <button (click)="isJoining.set(true)" class="option-btn">
+          Entrar na Sessão
+        </button>
+      </div>
+    </div>
+
+    @if (isCreating()) {
+      <div class="session-form">
+        <h3>Criar Nova Sessão</h3>
+        <input
+          type="text"
+          [value]="userName()"
+          (input)="onUserNameInput($event)"
+          placeholder="Seu nome"
+          class="form-input"
+        >
+        <input
+          type="text"
+          [value]="sessionName()"
+          (input)="onSessionNameInput($event)"
+          placeholder="Nome da sessão"
+          class="form-input"
+        >
+        <div class="form-actions">
+          <button (click)="createSession()" class="primary-btn">
+            Criar Sessão
+          </button>
+          <button (click)="isCreating.set(false)" class="secondary-btn">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (isJoining()) {
+      <div class="session-form">
+        <h3>Entrar em Sessão Existente</h3>
+        <input
+          type="text"
+          [value]="userName()"
+          (input)="onUserNameInput($event)"
+          placeholder="Seu nome"
+          class="form-input"
+        >
+        <input
+          type="text"
+          [value]="sessionId()"
+          (input)="onSessionIdInput($event)"
+          placeholder="ID da sessão"
+          class="form-input"
+        >
+        <div class="form-actions">
+          <button (click)="joinSession()" class="primary-btn">
+            Entrar na Sessão
+          </button>
+          <button (click)="isJoining.set(false)" class="secondary-btn">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="session-info">
+    <div class="session-header">
+      <h2>{{ session()?.name }}</h2>
+      <p>ID da Sessão: {{ session()?.id }}</p>
+      <div class="session-actions">
+        <button (click)="copySessionLink()" class="secondary-btn">
+          📋 Copiar Link
+        </button>
+        <button (click)="leaveSession()" class="secondary-btn">
+          Sair da Sessão
+        </button>
+      </div>
+    </div>
+
+    <app-board></app-board>
+  </div>
+}
