@@ -2,7 +2,9 @@
 builder = "dockerfile"
 
 [deploy]
-startCommand = "npm start"  # Ou "node combined-server/combined-server.js" direto
+startCommand = "node combined-server.js"
+healthCheckPath = "/health"
+healthCheckTimeout = 100
 
 [environments]
   [environments.production]
