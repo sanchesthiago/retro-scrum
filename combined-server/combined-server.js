@@ -230,6 +230,10 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log('🚀 EASYRETRO CLONE - SERVIDOR INICIADO!');
   console.log(`📍 Ambiente: ${isProduction ? 'Produção' : 'Desenvolvimento'}`);
   console.log(`🎯 Porta: ${PORT}`);
+  console.log(`🌐 URL: https://${process.env.RAILWAY_STATIC_URL || 'seu-app.railway.app'}`);
+  console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
+  console.log(`💾 Sessões ativas: ${sessions.size}`);
+  console.log('='.repeat(50));
 
   if (isProduction) {
     console.log(`🌐 URL: https://seu-app.railway.app`);

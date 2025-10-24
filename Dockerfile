@@ -11,7 +11,7 @@ RUN npm ci --only=production
 
 EXPOSE 3000
 
-# ✅ FORÇAR VARIÁVEIS DE PRODUÇÃO
+# ✅ FORÇAR PORTA 3000 EXPLICITAMENTE
 ENV NODE_ENV=production
 ENV PORT=3000
 
