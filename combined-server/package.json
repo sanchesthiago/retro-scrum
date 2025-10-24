@@ -10,7 +10,7 @@
     "postinstall": "echo 'Backend dependencies installed'",
     "dev": "set NODE_ENV=development&& node combined-server.js",
     "build-and-start": "cd .. && ng build && NODE_ENV=production node combined-server.js",
-    "debug:files": "find /app -name \"index.html\" -type f",
+    "debug:files": "find /app -name \"index.html\" -type f"
   },
   "dependencies": {
     "express": "^4.18.2",
