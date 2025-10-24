@@ -1,0 +1,18 @@
+[phases.setup]
+cmds = [
+  "curl -fsSL https://deb.nodesource.com/setup_18.x | bash -",
+  "apt-get install -y nodejs",
+  "npm install -g @angular/cli"
+]
+
+[phases.install]
+cmds = [
+  "npm install",
+  "cd combined-server && npm install"
+]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "bash start.sh"

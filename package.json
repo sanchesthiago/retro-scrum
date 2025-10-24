@@ -3,11 +3,17 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "node combined-server/combined-server.js",
+    "start": "bash start.sh",
     "build": "ng build",
     "dev:frontend": "ng serve",
     "dev:backend": "cd backend && npm run dev",
     "install:all": "npm install && cd combined-server && npm install"
+  },
+  "keywords": ["retrospective", "websocket", "angular"],
+  "author": "Seu Nome",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
   },
   "prettier": {
     "printWidth": 100,
