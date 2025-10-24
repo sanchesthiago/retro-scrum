@@ -1,9 +1,10 @@
 [build]
-builder = "nixpacks"
+builder = "dockerfile"
 
 [deploy]
-startCommand = "cd combined-server && node combined-server.js"
+startCommand = "npm start"  # Ou "node combined-server/combined-server.js" direto
 
 [environments]
   [environments.production]
     NODE_ENV = "production"
+    PORT = 3000

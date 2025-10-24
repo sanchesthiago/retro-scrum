@@ -1,14 +1,12 @@
 #!/bin/bash
 
-echo "🚀 Iniciando EasyRetro Clone..."
-echo "📦 Node.js version: $(node --version)"
-echo "📦 npm version: $(npm --version)"
+echo "🚀 Iniciando Retro Scrum..."
+echo "📦 Node.js: $(node --version)"
+echo "📦 npm: $(npm --version)"
 
-# Build do Angular
-echo "🏗️  Building Angular app..."
+# Build do Angular (já feito no Dockerfile, mas mantemos por segurança)
 npm run build
 
 # Iniciar servidor
-echo "🎯 Iniciando servidor..."
-cd backend
-node server.js
+echo "🎯 Starting server..."
+node combined-server/combined-server.js
