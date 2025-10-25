@@ -4,12 +4,13 @@ WORKDIR /app
 
 COPY . .
 
-# ✅ Build do Angular com output explícito
+# ✅ Build do Angular - estrutura natural
 RUN npm ci
-RUN npx ng build --configuration production --output-path=dist/retro-scrum/browser
+RUN npx ng build --configuration production
 
-# ✅ Verificar se o build foi criado
-RUN echo "📁 Estrutura após build:" && ls -la dist/ && ls -la dist/retro-scrum/browser
+# ✅ Verificação rápida
+RUN echo "✅ Build completo. Estrutura:" && \
+    ls -la /app/dist/retro-scrum/browser/ | head -10
 
 WORKDIR /app/combined-server
 RUN npm ci --production

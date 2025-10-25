@@ -9,7 +9,8 @@
     "build:verbose": "ng build --configuration=production && echo '=== VERIFICAÇÃO DO BUILD ===' && ls -la dist/retro-scrum/ && echo '--- BROWSER ---' && ls -la dist/retro-scrum/browser/ | head -10",
     "dev:frontend": "ng serve",
     "dev:backend": "cd backend && npm run dev",
-    "install:all": "npm install && cd combined-server && npm install"
+    "install:all": "npm install && cd combined-server && npm install",
+    "build:analyze": "ng build --configuration production && node analyze-build.js"
   },
   "keywords": ["retrospective", "websocket", "angular"],
   "author": "Seu Nome",
