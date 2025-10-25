@@ -24,10 +24,10 @@ if (isProduction) {
   const fs = require('fs');
   const path = require('path');
 
-  console.log('🔍 CONFIGURANDO ANGULAR (NOVO BUILD SYSTEM)...');
+  console.log('🔍 CONFIGURANDO ANGULAR (ESTRUTURA ANINHADA)...');
 
-  // ✅ CAMINHO CORRETO para o novo Angular build system
-  const angularPath = path.join(__dirname, '../dist/retro-scrum/browser');
+  // ✅ CAMINHO CORRETO - com a estrutura aninhada
+  const angularPath = path.join(__dirname, '../dist/retro-scrum/browser/browser');
   const indexPath = path.join(angularPath, 'index.html');
 
   console.log(`📁 Caminho do build: ${angularPath}`);
@@ -40,175 +40,133 @@ if (isProduction) {
     // Listar arquivos para confirmação
     try {
       const files = fs.readdirSync(angularPath);
-      const totalFiles = files.length;
-      const htmlFiles = files.filter(f => f.endsWith('.html'));
-      const jsFiles = files.filter(f => f.endsWith('.js'));
-
-      console.log(`📊 Estatísticas do build:`);
-      console.log(`   📄 Total de arquivos: ${totalFiles}`);
-      console.log(`   🏷️  Arquivos HTML: ${htmlFiles.length}`);
-      console.log(`   ⚡ Arquivos JS: ${jsFiles.length}`);
-      console.log(`   📦 Primeiros arquivos: ${files.slice(0, 8).join(', ')}...`);
+      console.log(`📄 Total de arquivos: ${files.length}`);
+      console.log(`📄 Primeiros arquivos: ${files.slice(0, 10).join(', ')}`);
     } catch (error) {
       console.log('⚠️  Erro ao listar arquivos:', error.message);
     }
 
     // ✅ Servir arquivos estáticos do Angular
-    app.use(express.static(angularPath, {
-      index: false, // Importante para SPA
-      etag: true,
-      lastModified: true,
-      maxAge: '1h'
-    }));
+    app.use(express.static(angularPath));
 
     // ✅ Rota para SPA - todas as rotas vão para index.html
     app.get('*', (req, res) => {
-      console.log(`🌐 Servindo SPA para: ${req.path}`);
       res.sendFile(indexPath);
     });
 
     console.log('🚀 ANGULAR CONFIGURADO COM SUCESSO!');
-    console.log(`📡 Servindo de: ${angularPath}`);
 
   } else {
-    console.error('❌ ERRO: index.html não encontrado!');
+    console.error('❌ index.html não encontrado no caminho aninhado!');
 
-    // Debug detalhado da estrutura
-    console.log('🔍 INVESTIGANDO ESTRUTURA:');
-    try {
-      const checkPath = (checkPath, description) => {
-        if (fs.existsSync(checkPath)) {
-          const items = fs.readdirSync(checkPath);
-          console.log(`✅ ${description}: ${checkPath}`);
-          console.log(`   Conteúdo: [${items.join(', ')}]`);
-          return true;
-        } else {
-          console.log(`❌ ${description}: ${checkPath} - NÃO EXISTE`);
-          return false;
+    // ✅ VERIFICAÇÃO COMPLETA DA ESTRUTURA
+    console.log('🔍 VERIFICAÇÃO COMPLETA DA ESTRUTURA:');
+
+    const checkStructure = (basePath) => {
+      try {
+        if (fs.existsSync(basePath)) {
+          const items = fs.readdirSync(basePath);
+          console.log(`📁 ${basePath}:`);
+          items.forEach(item => {
+            const fullPath = path.join(basePath, item);
+            const isDir = fs.statSync(fullPath).isDirectory();
+            console.log(`   ${isDir ? '📁' : '📄'} ${item}${isDir ? '/' : ''}`);
+
+            // Se for diretório, verificar um nível mais profundo
+            if (isDir && item === 'browser') {
+              const subItems = fs.readdirSync(fullPath);
+              console.log(`      ↳ ${subItems.slice(0, 5).join(', ')}${subItems.length > 5 ? '...' : ''}`);
+            }
+          });
         }
-      };
+      } catch (e) {
+        console.log(`   ❌ Erro: ${e.message}`);
+      }
+    };
 
-      // Verificar toda a hierarquia
-      checkPath(path.join(__dirname, '..', 'dist'), '../dist');
-      checkPath(path.join(__dirname, '..', 'dist', 'retro-scrum'), '../dist/retro-scrum');
-      checkPath(path.join(__dirname, '..', 'dist', 'retro-scrum', 'browser'), '../dist/retro-scrum/browser');
+    // Verificar toda a estrutura
+    checkStructure(path.join(__dirname, '..', 'dist'));
+    checkStructure(path.join(__dirname, '..', 'dist', 'retro-scrum'));
+    checkStructure(path.join(__dirname, '..', 'dist', 'retro-scrum', 'browser'));
 
-      // Verificar se há index.html em outros lugares
-      console.log('🔎 PROCURANDO INDEX.HTML EM OUTROS LOCAIS:');
-      const searchPaths = [
-        path.join(__dirname, '..', 'dist', 'retro-scrum'),
-        path.join(__dirname, '..', 'dist'),
-        path.join(__dirname, 'dist', 'retro-scrum', 'browser'),
-        path.join(__dirname, 'dist', 'retro-scrum'),
-        path.join(__dirname, 'dist')
-      ];
+    // ✅ PROCURAR INDEX.HTML RECURSIVAMENTE
+    console.log('🔎 PROCURANDO INDEX.HTQL RECURSIVAMENTE:');
 
-      for (const searchPath of searchPaths) {
-        const testIndexPath = path.join(searchPath, 'index.html');
-        if (fs.existsSync(testIndexPath)) {
-          console.log(`🎯 INDEX.HTML ENCONTRADO EM: ${searchPath}`);
+    function findIndexHtml(startPath, maxDepth = 3) {
+      function search(currentPath, depth) {
+        if (depth > maxDepth) return null;
+
+        try {
+          const items = fs.readdirSync(currentPath);
+          for (const item of items) {
+            const fullPath = path.join(currentPath, item);
+
+            if (item === 'index.html') {
+              return fullPath;
+            }
+
+            if (fs.statSync(fullPath).isDirectory()) {
+              const result = search(fullPath, depth + 1);
+              if (result) return result;
+            }
+          }
+        } catch (e) {
+          // Ignorar erros de leitura
         }
+        return null;
       }
 
-    } catch (e) {
-      console.log('💥 Erro na investigação:', e.message);
+      return search(startPath, 0);
     }
 
-    // Rota de fallback mais informativa
-    app.get('*', (req, res) => {
-      if (req.path === '/health') {
-        return res.json({
-          status: 'ERROR',
-          message: 'Angular build not found',
-          expectedPath: angularPath,
-          structure: {
-            currentDir: __dirname,
-            angularPath: angularPath,
-            indexPath: indexPath
-          },
-          timestamp: new Date().toISOString()
-        });
-      }
+    const foundIndexPath = findIndexHtml(path.join(__dirname, '..', 'dist'));
+    if (foundIndexPath) {
+      console.log(`🎯 INDEX.HTML ENCONTRADO EM: ${foundIndexPath}`);
+      const correctAngularPath = path.dirname(foundIndexPath);
 
-      res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Erro - Build Angular</title>
-          <meta charset="UTF-8">
-          <style>
-            body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              margin: 0;
-              padding: 20px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              min-height: 100vh;
-            }
-            .container {
-              max-width: 800px;
-              margin: 0 auto;
-              background: rgba(255,255,255,0.1);
-              padding: 30px;
-              border-radius: 10px;
-              backdrop-filter: blur(10px);
-            }
-            .error {
-              background: rgba(255,0,0,0.2);
-              padding: 20px;
-              border-radius: 8px;
-              border-left: 4px solid #ff4444;
-              margin: 20px 0;
-            }
-            .info {
-              background: rgba(255,255,255,0.1);
-              padding: 20px;
-              border-radius: 8px;
-              margin: 15px 0;
-            }
-            code {
-              background: rgba(0,0,0,0.3);
-              padding: 4px 8px;
-              border-radius: 4px;
-              font-family: 'Courier New', monospace;
-            }
-            h1 { margin-top: 0; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>🚨 Angular Build Não Encontrado</h1>
+      // Configurar com o caminho encontrado
+      app.use(express.static(correctAngularPath));
+      app.get('*', (req, res) => {
+        res.sendFile(foundIndexPath);
+      });
+      console.log(`🚀 CONFIGURADO COM SUCESSO NO CAMINHO: ${correctAngularPath}`);
 
-            <div class="error">
-              <h3>Problema Detectado</h3>
-              <p>O servidor não encontrou o build do Angular no caminho esperado.</p>
-              <p><strong>Caminho esperado:</strong> <code>${angularPath}</code></p>
-            </div>
+    } else {
+      console.error('💥 index.html não encontrado em nenhum lugar!');
 
+      // Rota de fallback
+      app.get('*', (req, res) => {
+        if (req.path === '/health') {
+          return res.json({
+            status: 'ERROR',
+            message: 'Angular build structure issue',
+            investigation: 'Found nested browser folders',
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        res.send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Estrutura de Build Inesperada</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; }
+              .info { background: #e3f2fd; padding: 20px; border-radius: 5px; }
+            </style>
+          </head>
+          <body>
+            <h1>🔍 Estrutura de Build Inesperada</h1>
             <div class="info">
-              <h3>📋 Informações Técnicas</h3>
-              <ul>
-                <li><strong>Diretório atual:</strong> <code>${__dirname}</code></li>
-                <li><strong>Porta:</strong> ${PORT}</li>
-                <li><strong>Ambiente:</strong> ${process.env.NODE_ENV}</li>
-                <li><strong>Angular Builder:</strong> @angular/build:application</li>
-              </ul>
+              <p>O Angular gerou uma estrutura aninhada com múltiplas pastas "browser".</p>
+              <p><strong>Caminho esperado:</strong> /app/dist/retro-scrum/browser/browser/</p>
+              <p>Verifique a configuração do angular.json.</p>
             </div>
-
-            <div class="info">
-              <h3>🔧 Próximos Passos</h3>
-              <ol>
-                <li>Verifique se o build foi executado com sucesso</li>
-                <li>Confirme que o build gerou a pasta <code>browser/</code></li>
-                <li>Verifique os logs de build no Railway</li>
-                <li>O caminho pode ser: <code>/app/dist/retro-scrum/browser/</code></li>
-              </ol>
-            </div>
-          </div>
-        </body>
-        </html>
-      `);
-    });
+          </body>
+          </html>
+        `);
+      });
+    }
   }
 }
 app.get('/test', (req, res) => {
