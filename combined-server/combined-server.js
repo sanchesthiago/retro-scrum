@@ -94,14 +94,10 @@ class RetroScrumServer {
     console.log('📦 Configurando Angular SPA...');
 
     const angularConfigs = [
-      // ✅ Estrutura atual (aninhada)
-      { path: '../dist/retro-scrum/browser/browser', name: 'aninhada' },
-      // ✅ Estrutura padrão esperada
-      { path: '../dist/retro-scrum/browser', name: 'padrão' },
-      // ✅ Estrutura alternativa
-      { path: '../dist/retro-scrum', name: 'alternativa' },
-      // ✅ Fallback absoluto
-      { path: '/app/dist/retro-scrum/browser', name: 'absoluta' }
+      // ✅ ESTRUTURA NATURAL (prioridade máxima)
+      { path: '../dist/retro-scrum/browser', name: 'natural' },
+      // ❌ Estrutura antiga (fallback apenas)
+      { path: '../dist/retro-scrum/browser/browser', name: 'aninhada' }
     ];
 
     let angularPath = null;
@@ -113,6 +109,17 @@ class RetroScrumServer {
       if (fs.existsSync(indexPath)) {
         angularPath = testPath;
         console.log(`✅ Angular encontrado (${config.name}): ${angularPath}`);
+
+        // ✅ Debug dos arquivos principais
+        try {
+          const files = fs.readdirSync(angularPath);
+          const mainFiles = files.filter(f =>
+            f.includes('main.') || f.includes('styles.') || f === 'index.html'
+          );
+          console.log(`📦 Arquivos principais: ${mainFiles.join(', ')}`);
+        } catch (e) {
+          console.log('⚠️  Erro ao listar arquivos:', e.message);
+        }
         break;
       } else {
         console.log(`❌ Não encontrado (${config.name}): ${testPath}`);
@@ -125,12 +132,11 @@ class RetroScrumServer {
         index: false,
         etag: true,
         lastModified: true,
-        maxAge: this.isProduction ? '1h' : '0'
+        maxAge: '1h'
       }));
 
-      // ✅ Rota SPA para todas as outras requisições
+      // ✅ Rota SPA
       this.app.get('*', (req, res) => {
-        // Ignorar rotas de API
         if (req.path.startsWith('/api/') || req.path.startsWith('/health')) {
           return res.status(404).json({ error: 'Endpoint não encontrado' });
         }
@@ -140,8 +146,10 @@ class RetroScrumServer {
       });
 
       console.log('🎉 Angular SPA configurado com sucesso!');
+      console.log(`📁 Servindo de: ${angularPath}`);
+
     } else {
-      console.error('💥 Angular não encontrado em nenhum local!');
+      console.error('💥 Angular não encontrado!');
       this.setupFallbackRoutes();
     }
   }
