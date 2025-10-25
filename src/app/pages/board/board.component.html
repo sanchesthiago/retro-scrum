@@ -9,16 +9,6 @@
           <strong>✅ Finalizados:</strong> {{ getFinishedCount() }}/{{ getTotalParticipants() }}
         </div>
 
-        @if (session()!.isRevealed) {
-          <div class="stat revealed">
-            <strong>🎉 Cards Revelados!</strong>
-          </div>
-        } @else {
-          <div class="stat hidden">
-            <strong>🔒 Cards Ocultos</strong>
-          </div>
-        }
-
         <!-- Status da conexão -->
         <div class="stat connection" [class]="connectionStatus()">
           @switch (connectionStatus()) {
@@ -74,20 +64,6 @@
         </span>
       }
     </div>
-
-    <!-- Mensagem informativa -->
-    @if (!session()!.isRevealed) {
-      <div class="info-message">
-        <p>📝 <strong>Escreva seus cards</strong> - Eles aparecerão borrados para todos em tempo real</p>
-        <p>✅ <strong>Clique em "Finalizar"</strong> quando terminar de escrever</p>
-        <p>👀 <strong>Quando todos finalizarem</strong> - Os cards serão revelados para discussão</p>
-      </div>
-    } @else {
-      <div class="info-message revealed">
-        <p>🎉 <strong>Discussão liberada!</strong> - Todos os cards estão visíveis</p>
-        <p>👍 <strong>Vote nos melhores cards</strong> clicando no botão de like</p>
-      </div>
-    }
 
     <!-- Colunas -->
     <div class="board-columns">
