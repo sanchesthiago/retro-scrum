@@ -18,6 +18,9 @@
 }
 
 .option-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background: white;
   padding: 30px;
   border-radius: 8px;

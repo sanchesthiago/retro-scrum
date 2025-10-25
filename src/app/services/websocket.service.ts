@@ -26,7 +26,7 @@ export class WebsocketService {
       // ✅ NOVA URL DO RAILWAY
       return 'wss://retro-scrum-production.up.railway.app';
     }
-    return 'ws://localhost:3001';
+    return 'ws://localhost:3000';
   }
 
   private isProduction(): boolean {
