@@ -42,6 +42,7 @@
   background: #4CAF50;
   color: white;
   border: none;
+  width: 50%;
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
@@ -164,4 +165,55 @@
   background: #e8f5e8;
   border-color: #4CAF50;
   color: #2e7d32;
+}
+
+
+ .session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.session-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.primary-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: #757575;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.link-btn {
+  background: #2032ad;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.center-btn{
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  margin-top: 21px;
+  background: white;
 }

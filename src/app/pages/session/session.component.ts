@@ -1,30 +1,42 @@
-import { Component, inject, signal, effect, OnDestroy } from '@angular/core';
-import { BoardService } from '../../services/board.service';
-import {BoardComponent} from '../board/board.component';
+import {Component, inject, signal, effect, OnDestroy, OnInit} from '@angular/core';
+import {BoardService} from '../../services/board.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-session',
   templateUrl: './session.component.html',
   imports: [
-    BoardComponent
+    ReactiveFormsModule,
+    NgClass
   ],
   styleUrls: ['./session.component.scss']
 })
-export class SessionComponent implements OnDestroy {
-  private boardService = inject(BoardService);
+export class SessionComponent implements OnDestroy, OnInit {
+  private boardService: BoardService = inject(BoardService);
+  private router: Router = inject(Router);
+  private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
 
-  session = this.boardService.currentSession;
-  currentParticipant = this.boardService.currentParticipant;
-  connectionStatus = this.boardService.connectionStatus;
+  public creatForm = new FormGroup({
+    nameFormCreate: new FormControl('', [Validators.required]),
+    sessionName: new FormControl('', [Validators.required]),
+  });
+  public joinForm = new FormGroup({
+    joinName: new FormControl('', [Validators.required]),
+    joinSession: new FormControl('', [Validators.required]),
+  })
 
-  isCreating = signal(false);
-  isJoining = signal(false);
-  isLoading = signal(false);
-  errorMessage = signal('');
 
-  sessionName = signal('');
-  userName = signal('');
-  sessionId = signal('');
+  public session = this.boardService.currentSession;
+  private connectionStatus = this.boardService.connectionStatus;
+  private isLoading = signal(false);
+  private errorMessage = signal('');
+  public isJoinOrCreate$ = signal('');
+
+  ngOnInit() {
+    this.haveUrlParams()
+  }
 
   private connectionEffect = effect(() => {
     const status = this.connectionStatus();
@@ -35,9 +47,23 @@ export class SessionComponent implements OnDestroy {
     }
   });
 
+  private haveUrlParams = (): void => {
+    const params: string = this.router.url
+
+    if (params.includes('session')) {
+      const session: string = this.activatedRoute.snapshot.queryParams['session']
+      console.log(session)
+      this.joinForm.get('joinSession')?.setValue(session)
+      this.joinForm.get('joinSession')?.disable()
+      this.isJoinOrCreate$.set('join')
+
+    }
+  }
+
+
   createSession(): void {
-    const name = this.userName().trim();
-    const sessionName = this.sessionName().trim();
+    const name = this.creatForm.controls['nameFormCreate'].value;
+    const sessionName = this.creatForm.controls['sessionName'].value;
 
     if (name && sessionName) {
       this.isLoading.set(true);
@@ -51,12 +77,13 @@ export class SessionComponent implements OnDestroy {
 
       this.boardService.createSession(sessionName, name);
       this.isLoading.set(false);
+      this.router.navigate(['/board']);
     }
   }
 
   joinSession(): void {
-    const name = this.userName().trim();
-    const sessionId = this.sessionId().trim();
+    const name = this.joinForm.controls['joinName'].value;
+    const sessionId = this.joinForm.controls['joinSession'].value;
 
     if (name && sessionId) {
       this.isLoading.set(true);
@@ -70,45 +97,13 @@ export class SessionComponent implements OnDestroy {
 
       this.boardService.joinSession(sessionId, name);
       this.isLoading.set(false);
+      this.router.navigate(['/board']);
     }
   }
 
-  leaveSession(): void {
-    this.boardService.leaveSession();
-    this.resetForm();
-  }
-
-  copySessionLink(): void {
-    const session = this.session();
-    if (session) {
-      const url = `${window.location.origin}?session=${session.id}`;
-      navigator.clipboard.writeText(url);
-      alert('✅ Link copiado! Compartilhe com outros participantes.');
-    }
-  }
-
-  private resetForm(): void {
-    this.sessionName.set('');
-    this.userName.set('');
-    this.sessionId.set('');
-    this.isCreating.set(false);
-    this.isJoining.set(false);
-    this.errorMessage.set('');
-  }
-
-  onUserNameInput(event: Event): void {
-    this.userName.set((event.target as HTMLInputElement).value);
-  }
-
-  onSessionNameInput(event: Event): void {
-    this.sessionName.set((event.target as HTMLInputElement).value);
-  }
-
-  onSessionIdInput(event: Event): void {
-    this.sessionId.set((event.target as HTMLInputElement).value);
-  }
 
   ngOnDestroy(): void {
     this.connectionEffect.destroy();
+    this.errorMessage.set('');
   }
 }

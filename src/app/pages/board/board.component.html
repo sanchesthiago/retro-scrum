@@ -1,18 +1,32 @@
 @if (session()) {
   <div class="board-container">
+
+      <div class="session-header">
+        <h2>{{ session()?.name }}</h2>
+        <p>ID da Sessão: {{ session()?.id }}</p>
+        <div class="session-actions">
+          <button (click)="copySessionLink()" class="link-btn">
+             Copiar Link
+          </button>
+          <button (click)="leaveSession()" class="secondary-btn">
+            Sair da Sessão
+          </button>
+        </div>
+      </div>
+
     <header class="board-header">
       <div class="session-stats">
         <div class="stat">
           <strong>👥 Participantes:</strong> {{ getTotalParticipants() }}
         </div>
         <div class="stat">
-          <strong>✅ Finalizados:</strong> {{ getFinishedCount() }}/{{ getTotalParticipants() }}
+          <strong>Finalizados:</strong> {{ getFinishedCount() }}/{{ getTotalParticipants() }}
         </div>
 
         <!-- Status da conexão -->
         <div class="stat connection" [class]="connectionStatus()">
           @switch (connectionStatus()) {
-            @case ('connected') { ✅ Conectado }
+            @case ('connected') { Conectado }
             @case ('connecting') { ⏳ Conectando... }
             @case ('disconnected') { ❌ Offline }
           }
@@ -20,15 +34,7 @@
       </div>
 
       <div class="board-controls">
-        @if (!hasCurrentUserFinished() && !session()!.isRevealed) {
-          <button (click)="markAsFinished()" class="finish-btn" [disabled]="isFinishing() || connectionStatus() !== 'connected'">
-            @if (isFinishing()) {
-              ⏳
-            } @else {
-              ✅ Finalizar
-            }
-          </button>
-        }
+
 
         @if (allUsersFinished() && !session()!.isRevealed) {
           <button (click)="revealCards()" class="reveal-btn" [disabled]="isRevealing() || connectionStatus() !== 'connected'">
@@ -63,6 +69,7 @@
           {{ participant.name }}{{ participant.hasFinished ? ' ✅' : ' ⏳' }}
         </span>
       }
+
     </div>
 
     <!-- Colunas -->
@@ -78,5 +85,16 @@
         ></app-column>
       }
     </div>
+    @if (!hasCurrentUserFinished() && !session()!.isRevealed) {
+      <div class="center-btn">
+      <button (click)="markAsFinished()" class="finish-btn" [disabled]="isFinishing() || connectionStatus() !== 'connected'">
+        @if (isFinishing()) {
+          ⏳
+        } @else {
+       Finalizar
+        }
+      </button>
+      </div>
+    }
   </div>
 }
