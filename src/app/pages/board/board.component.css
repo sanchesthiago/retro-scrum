@@ -42,6 +42,7 @@
   background: #4CAF50;
   color: white;
   border: none;
+  width: 50%;
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
@@ -199,4 +200,20 @@
   padding: 12px 24px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.link-btn {
+  background: #2032ad;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.center-btn{
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  margin-top: 21px;
+  background: white;
 }
