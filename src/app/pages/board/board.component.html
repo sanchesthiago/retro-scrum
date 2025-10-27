@@ -1,5 +1,19 @@
 @if (session()) {
   <div class="board-container">
+
+      <div class="session-header">
+        <h2>{{ session()?.name }}</h2>
+        <p>ID da Sessão: {{ session()?.id }}</p>
+        <div class="session-actions">
+          <button (click)="copySessionLink()" class="secondary-btn">
+            📋 Copiar Link
+          </button>
+          <button (click)="leaveSession()" class="secondary-btn">
+            Sair da Sessão
+          </button>
+        </div>
+      </div>
+
     <header class="board-header">
       <div class="session-stats">
         <div class="stat">

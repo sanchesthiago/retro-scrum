@@ -1,5 +1,5 @@
-import { Component, inject, signal, effect, OnDestroy } from '@angular/core';
-import { BoardService } from '../../services/board.service';
+import {Component, inject, signal, effect, OnDestroy} from '@angular/core';
+import {BoardService} from '../../services/board.service';
 import {Card} from '../../moldels/cards.models';
 import {ColumnComponent} from '../column/column.component';
 
@@ -22,9 +22,9 @@ export class BoardComponent implements OnDestroy {
   isRevealing = signal(false);
 
   columns = [
-    { title: '✅ Foi bom', type: 'went-well' as const, color: '#4CAF50' },
-    { title: '🔄 A melhorar', type: 'to-improve' as const, color: '#FF9800' },
-    { title: '🎯 Ações', type: 'action-items' as const, color: '#2196F3' }
+    {title: '✅ Foi bom', type: 'went-well' as const, color: '#4CAF50'},
+    {title: '🔄 A melhorar', type: 'to-improve' as const, color: '#FF9800'},
+    {title: '🎯 Ações', type: 'action-items' as const, color: '#2196F3'}
   ];
 
   private connectionEffect = effect(() => {
@@ -79,6 +79,19 @@ export class BoardComponent implements OnDestroy {
 
   canAddCards(): boolean {
     return !this.hasCurrentUserFinished() && !this.session()?.isRevealed || false;
+  }
+
+  leaveSession(): void {
+    this.boardService.leaveSession();
+  }
+
+  copySessionLink(): void {
+    const session = this.session();
+    if (session) {
+      const url = `${window.location.origin}?session=${session.id}`;
+      navigator.clipboard.writeText(url);
+      alert('✅ Link copiado! Compartilhe com outros participantes.');
+    }
   }
 
   ngOnDestroy(): void {
