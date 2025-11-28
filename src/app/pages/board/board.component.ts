@@ -34,6 +34,89 @@ export class BoardComponent implements OnDestroy {
     if (status === 'connected' && session) {
       console.log('✅ Reconectado - Sincronizando sessão...');
     }
+    const test= {
+      titlePage: 'Automatize. Inove.Eleve seu WorkFlow',
+      subTitlePage:'dgfdgdfgdfgdfgfgfgfdasdsdgregert',
+      buttonTextPage: 'Explore as Automações',
+      devInfos:{
+        icon:'sdffds',
+        title:'',
+        benefits:[{
+          number:'',
+          benefits:''
+        },{
+          number:'',
+          benefits:''
+        },{
+          number:'',
+          benefits:''
+        }
+        ],
+        comphanyInfos:{
+          icon:'sdffds',
+          title:'',
+          benefits:[{
+            number:'',
+            benefits:''
+          },{
+            number:'',
+            benefits:''
+          },{
+            number:'',
+            benefits:''
+          }
+          ]
+        }
+      },
+      automation:{
+        title:'',
+        cardsAutomation:[{
+          icon:'sdffds',
+          number:'',
+          title:'',
+          subTitle:'',
+          buttonText:'',
+          id:''
+        },
+          {
+            icon:'sdffds',
+            number:'',
+            title:'',
+            subTitle:'',
+            buttonText:'',
+            id:''
+          }
+        ],
+        categories:[{
+          icon:'sdffds',
+          text:'',
+          id:''
+        },{
+          icon:'sdffds',
+          text:'',
+          id:''
+        },{
+          icon:'sdffds',
+          text:'',
+          id:''
+
+        },{
+          icon:'sdffds',
+          text:'',
+          id:''
+        },{
+          icon:'sdffds',
+          text:'',
+          id:''
+        },{
+          icon:'sdffds',
+          text:'',
+          id:''
+        }]
+      }
+    };
+
+
   });
 
   markAsFinished(): void {
