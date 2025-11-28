@@ -89,9 +89,10 @@ class RetroScrumServer {
     this.wss.on('connection', (ws, request) => {
       if (this.isProduction) {
         const origin = request.headers.origin;
-        const allowedOrigins = [
-          'https://retro-scrum-production.up.railway.app'
-        ];
+        // ✅ ALTERAÇÃO: Ler origens permitidas da variável de ambiente
+        const allowedOrigins = process.env.ALLOWED_ORIGINS
+          ? process.env.ALLOWED_ORIGINS.split(',')
+          : [];
 
         if (origin && !allowedOrigins.includes(origin)) {
           console.log('🚫 Conexão rejeitada - origem não permitida:', origin);
