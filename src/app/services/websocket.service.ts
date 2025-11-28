@@ -22,11 +22,9 @@ export class WebsocketService {
   }
 
   private getWebSocketUrl(): string {
-    if (this.isProduction()) {
-      // ✅ NOVA URL DO RAILWAY
-      return 'wss://retro-scrum-production.up.railway.app';
-    }
-    return 'ws://localhost:3000';
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    return `${protocol}//${host}`;
   }
 
   private isProduction(): boolean {
